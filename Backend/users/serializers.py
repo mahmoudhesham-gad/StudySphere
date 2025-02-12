@@ -3,6 +3,7 @@ from django.core.validators import validate_email
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from .models import User, Profile 
+from django.contrib.auth import authenticate
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -33,6 +34,25 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user_profile = Profile.objects.create(user=user)
         return user
     
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if email is None or password is None:
+            raise serializers.ValidationError("Must include 'email' and 'password'.")
+
+        # Authenticate the user using email and password
+        user = authenticate(email=email, password=password)
+
+        if user is None:
+            raise serializers.ValidationError("Invalid email and password combination.")
+
+        return user
+
 
 
 
