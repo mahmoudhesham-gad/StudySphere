@@ -67,7 +67,7 @@ class Profile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
   bio = models.TextField(null=True, blank=True)
   Affiliation = models.CharField(max_length=255, null=True, blank=True)
-  # profile_picture = models.ImageField(upload_to='profile_pictures', null=True, blank=True)
+  profile_picture = models.URLField(null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
   def __str__(self):

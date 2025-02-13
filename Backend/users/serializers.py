@@ -26,11 +26,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         except email_validator.EmailNotValidError as e:
             raise serializers.ValidationError({"email": str(e)})
         return data
-    
+
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        user = User.objects.create_user(**validated_data)
-        user_profile = Profile.objects.create(user=user)
+        try:
+            user = User.objects.create_user(**validated_data)
+            Profile.objects.create(user=user)
+        except Exception as e:
+            raise serializers.ValidationError({"error": str(e)})
         return user
     
 class UserLoginSerializer(serializers.Serializer): 
@@ -52,7 +55,19 @@ class UserLoginSerializer(serializers.Serializer):
 
         return user
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'username']
+        read_only_fields = ['id', 'email', 'username']
 
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Profile
+        fields = ['user', 'bio', 'profile_picture', 'Affiliation']
+
+        
 
 
     

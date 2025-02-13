@@ -187,3 +187,11 @@ class RefreshTokenView(APIView):
             samesite='Lax'
         )
         return response
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = serializers.ProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user.profile
+    
