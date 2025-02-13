@@ -1,6 +1,5 @@
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.contrib.auth.password_validation import validate_password
+import email_validator
 from rest_framework import serializers
 from .models import User, Profile 
 from django.contrib.auth import authenticate
@@ -23,9 +22,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
           raise serializers.ValidationError({'password': 'Passwords must match.'})
         
         try:
-            validate_email(data['email'])  # Use Django's built-in email validator
-        except ValidationError:
-            raise serializers.ValidationError("Enter a valid email address.")
+            email_validator.validate_email(data['email'], check_deliverability=True) 
+        except email_validator.EmailNotValidError as e:
+            raise serializers.ValidationError({"email": str(e)})
         return data
     
     def create(self, validated_data):
@@ -34,7 +33,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user_profile = Profile.objects.create(user=user)
         return user
     
-class UserLoginSerializer(serializers.Serializer):
+class UserLoginSerializer(serializers.Serializer): 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
