@@ -21,9 +21,10 @@ class Group(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_groups')
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
 
     join_type = models.CharField(
         max_length=20,
@@ -40,7 +41,7 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
-class groupMember(models.Model):
+class GroupMember(models.Model):
     ROLE_CHOICES = [
         ('member', 'Member'),
         ('moderator', 'Moderator'),
@@ -48,7 +49,7 @@ class groupMember(models.Model):
     ]
 
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='groups')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships')
     user_role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
     joined_at = models.DateTimeField(auto_now_add=True)
 
@@ -59,6 +60,7 @@ class groupMember(models.Model):
         return f"{self.user.username} in {self.group.name} as {self.user_role}"
     
 class Course(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='courses')
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
