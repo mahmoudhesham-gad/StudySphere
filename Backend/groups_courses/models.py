@@ -20,6 +20,12 @@ class Group(models.Model):
         ('owner', 'Owner Only - only the owner can post'),
     ]
 
+    MEMBERS_EDIT_PERMISSIONS = [
+        ('moderators', 'Moderators and above can edit members'),
+        ('admins', 'Only admins and owner can edit members'),
+        ('owner', 'Only owner can edit members'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_groups')
     name = models.CharField(max_length=100, unique=True)
@@ -38,8 +44,15 @@ class Group(models.Model):
         default='members'
     )
 
+    edit_permissions = models.CharField(
+        max_length=20,
+        choices=MEMBERS_EDIT_PERMISSIONS,
+        default='admins'
+    ) 
+
     def __str__(self):
         return self.name
+
 
 class GroupMember(models.Model):
     ROLE_CHOICES = [
@@ -59,6 +72,20 @@ class GroupMember(models.Model):
     def __str__(self):
         return f"{self.user.username} in {self.group.name} as {self.user_role}"
     
+
+class JoinRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='join_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_requests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('group', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} requested to join {self.group.name}"
+
+
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='courses')
