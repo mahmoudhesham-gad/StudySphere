@@ -12,6 +12,7 @@ import logging
 class RegisterView(generics.CreateAPIView):
     serializer_class = serializers.UserRegisterSerializer
     permission_classes = (AllowAny,)
+    authentication_classes = []
 
     def create(self, request, *args, **kwargs):
         # Validate and create the new user
@@ -48,6 +49,8 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(APIView):
     permission_classes = (AllowAny,)
+    authentication_classes = []
+
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -85,7 +88,6 @@ class LogoutView(APIView):
         Handles user logout by blacklisting the refresh token and clearing cookies.
         """
         refresh_token = request.COOKIES.get('refresh_token')
-        print(refresh_token)
         if not refresh_token:
             return Response(
                 {"error": "No refresh token found"},
@@ -96,10 +98,13 @@ class LogoutView(APIView):
             token = RefreshToken(refresh_token)
             token.blacklist()
         except TokenError:
-            return Response(
+            response = Response(
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            response.delete_cookie('refresh_token')
+            response.delete_cookie('access_token')
+            return response
         except Exception as e:
             logging.error(e)
             return Response(
@@ -116,7 +121,9 @@ class LogoutView(APIView):
         return response
 
 class VerifyTokenView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    authentication_classes = []
+
     def post(self, request):
         """
         Handles token verification.
@@ -132,10 +139,13 @@ class VerifyTokenView(APIView):
             token = RefreshToken(refresh_token)
             token.check_blacklist()
         except TokenError:
-            return Response(
+            response = Response(
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            response.delete_cookie('refresh_token')
+            response.delete_cookie('access_token')
+            return response
         except Exception as e:
             logging.error(e)
             return Response(
@@ -149,7 +159,9 @@ class VerifyTokenView(APIView):
         )
     
 class RefreshTokenView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    authentication_classes = []
+    
     def post(self, request):
         """
         Handles token refresh.
@@ -165,10 +177,13 @@ class RefreshTokenView(APIView):
             token = RefreshToken(refresh_token)
             access_token = str(token.access_token)
         except TokenError:
-            return Response(
+            response = Response(
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            response.delete_cookie('refresh_token')
+            response.delete_cookie('access_token')
+            return response
         except Exception as e:
             logging.error(e)
             return Response(
