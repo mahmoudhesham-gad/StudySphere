@@ -1,5 +1,6 @@
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
+from .models import GroupMember
 
 def ensure_group_owner(request, group, message="You are not the owner of this group"):
     """
@@ -18,7 +19,6 @@ def ensure_group_owner(request, group, message="You are not the owner of this gr
             code=status.HTTP_403_FORBIDDEN,
         )
         
-
 
 def can_edit_members(user, group):
     if group.owner == user:
@@ -59,14 +59,32 @@ def ensure_can_edit_members(user, group, message="User doesn't have the permissi
         )
     
     
+def check_group_admin(user, group):
+    if group.owner == user:
+        return True
+    return GroupMember.objects.filter(user=user, group=group, role='admin').exists()
+
+
 def has_higher_role(user, member):
     roles = ['admin', 'moderator', 'member']
     return roles.index(user.user_role) < roles.index(member.user_role)
     
 
 def can_post(user, group):
+    """
+    Check if a user can post in a group based on post permissions
+
+    Args:
+        user: The user attempting to post
+        group: The group where the post would be made
+
+    Returns:
+        bool: True if user can post, False otherwise
+    """
+    if user == group.owner:
+        return True
     if group.post_permission == 'owner':
-        return group.owner == user
+        return group.owner == user  
 
     roles_needed = {
         'members': {'member', 'moderator', 'admin'},
@@ -74,9 +92,9 @@ def can_post(user, group):
         'admins': {'admin'}
     }.get(group.post_permission, set())
 
-    for member in group.members.all():
-        if member.user == user:
-            return member.user_role in roles_needed
+    member = group.members.filter(user=user).first()
+    if member:
+        return member.user_role in roles_needed
 
     return False
 
