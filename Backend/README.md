@@ -4,7 +4,7 @@ This document summarizes all API endpoints with details on request payloads and 
 
 ## User Endpoints
 - **Register**  
-  URL: `/register/`  
+  URL: `/user/register/`  
   Method: `POST`  
   Request Body:
   {
@@ -20,7 +20,7 @@ This document summarizes all API endpoints with details on request payloads and 
   Cookies: HttpOnly cookies `access_token` and `refresh_token`.
 
 - **Login**  
-  URL: `/login/`  
+  URL: `/user/login/`  
   Method: `POST`  
   Request Body:
   {
@@ -34,7 +34,7 @@ This document summarizes all API endpoints with details on request payloads and 
   Cookies: HttpOnly cookies `access_token` and `refresh_token`.
 
 - **Logout**  
-  URL: `/logout/`  
+  URL: `/user/logout/`  
   Method: `POST`  
   Response (205 RESET CONTENT):
   {
@@ -43,14 +43,14 @@ This document summarizes all API endpoints with details on request payloads and 
   Effect: Refresh and access tokens are blacklisted and deleted via cookie removal.
 
 - **Refresh Token**  
-  URL: `/token/refresh/`  
+  URL: `/user/token/refresh/`  
   Method: `POST`  
   Requirement: Valid `refresh_token` cookie must be present  
   Response (200 OK):
   • Sets a new `access_token` cookie.
 
 - **Verify Token**  
-  URL: `/token/verify/`  
+  URL: `/user/token/verify/`  
   Method: `POST`  
   Requirement: Valid `refresh_token` cookie must be present  
   Response (200 OK):
@@ -59,7 +59,7 @@ This document summarizes all API endpoints with details on request payloads and 
   }
 
 - **Profile**  
-  URL: `/profile/`  
+  URL: `/user/profile/`  
   Methods: `GET`, `PUT`  
   GET: Returns the user’s profile details as JSON.  
   PUT: Expects a JSON body with profile fields to update, and returns the updated profile.
