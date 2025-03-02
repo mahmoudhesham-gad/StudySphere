@@ -40,7 +40,25 @@ class GroupListAPIView(generics.ListAPIView):
     serializer_class = serializers.GroupSerializer
     queryset = models.Group.objects.filter(join_type__in=['open', 'request']).all()
     permission_classes = [AllowAny,]
+    search_fields = ['name', 'description']
+    filterset_fields = ['join_type']
     
+    
+
+class OwnedGroupListAPIView(generics.ListAPIView):
+    """
+    This view is used to list all groups owned by the user
+
+    Endpoint: `/user/groups/`
+    Methods: GET
+    Permissions: IsAuthenticated
+    """
+    serializer_class = serializers.GroupSerializer
+    permission_classes = [IsAuthenticated,]
+
+    def get_queryset(self):
+        return models.Group.objects.filter(owner=self.request.user)
+
 
 class GroupDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
