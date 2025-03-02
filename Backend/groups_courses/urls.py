@@ -8,6 +8,7 @@ from .views import (
 
 urlpatterns = [
     path('groups/', CreateGroupAPIView.as_view(), name='group_create'),
+    path('user/groups/', OwnedGroupListAPIView.as_view(), name='user_group_list'),
     path('groups/list/', GroupListAPIView.as_view(), name='group_list'),
     path('groups/<uuid:group_id>/', GroupDetailAPIView.as_view(), name='group_detail'),
     path('groups/<uuid:group_id>/members/', GroupMemberListAPIView.as_view(), name='group_member_list'),
