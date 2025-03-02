@@ -4,7 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from . import serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-import logging 
+import logging
 
 
 # Create your views here.
@@ -35,15 +35,15 @@ class RegisterView(generics.CreateAPIView):
             key='access_token',
             value=access_token,
             httponly=True,
-            secure=True,      
-            samesite='Lax'     
+            secure=True,
+            samesite='None'
         )
         response.set_cookie(
             key='refresh_token',
             value=refresh_token,
             httponly=True,
             secure=True,
-            samesite='Lax'
+            samesite='None'
         )
         return response
 
@@ -70,14 +70,14 @@ class LoginView(APIView):
             value=access_token,
             httponly=True,
             secure=True,
-            samesite='Lax'
+            samesite='None'
         )
         response.set_cookie(
             key='refresh_token',
             value=refresh_token,
             httponly=True,
             secure=True,
-            samesite='Lax'
+            samesite='None'
         )
         return response
 
@@ -102,8 +102,8 @@ class LogoutView(APIView):
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            response.delete_cookie('refresh_token')
-            response.delete_cookie('access_token')
+            response.delete_cookie('refresh_token', samesite='None')
+            response.delete_cookie('access_token', samesite='None')
             return response
         except Exception as e:
             logging.error(e)
@@ -116,8 +116,8 @@ class LogoutView(APIView):
             {"message": "Logged out successfully"},
             status=status.HTTP_205_RESET_CONTENT
         )
-        response.delete_cookie('refresh_token')
-        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token', samesite='None')
+        response.delete_cookie('access_token', samesite='None')
         return response
 
 class VerifyTokenView(APIView):
@@ -143,9 +143,10 @@ class VerifyTokenView(APIView):
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            response.delete_cookie('refresh_token')
-            response.delete_cookie('access_token')
+            response.delete_cookie('refresh_token', samesite='None')
+            response.delete_cookie('access_token', samesite='None')
             return response
+
         except Exception as e:
             logging.error(e)
             return Response(
@@ -157,11 +158,11 @@ class VerifyTokenView(APIView):
             {"message": "Token is valid"},
             status=status.HTTP_200_OK
         )
-    
+
 class RefreshTokenView(APIView):
     permission_classes = (AllowAny,)
     authentication_classes = []
-    
+
     def post(self, request):
         """
         Handles token refresh.
@@ -181,8 +182,8 @@ class RefreshTokenView(APIView):
                 {"error": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            response.delete_cookie('refresh_token')
-            response.delete_cookie('access_token')
+            response.delete_cookie('refresh_token', samesite='None')
+            response.delete_cookie('access_token', samesite='None')
             return response
         except Exception as e:
             logging.error(e)
@@ -199,7 +200,7 @@ class RefreshTokenView(APIView):
             value=access_token,
             httponly=True,
             secure=True,
-            samesite='Lax'
+            samesite='None'
         )
         return response
 
@@ -209,4 +210,4 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.profile
-    
+
