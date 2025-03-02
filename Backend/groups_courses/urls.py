@@ -3,7 +3,7 @@ from .views import (
     CreateGroupAPIView, GroupListAPIView, GroupDetailAPIView,
     GroupMemberListAPIView, CreateGroupMemberAPIView, GroupMemberSelfDetailAPIView, GroupMembershipsDetailAPIView,
     GroupJoinRequestListAPIView, JoinRequestResponseAPIView,
-    CoursesAPIView, CourseDetailAPIView
+    CoursesAPIView, CourseDetailAPIView, OwnedGroupListAPIView
 )
 
 urlpatterns = [
