@@ -1,65 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import React from 'react';
+import { useProfile } from '../../features/user/useProfile';
 
 function Profile() {
-  const [profile, setProfile] = useState({
-    user: {
-      id: '',
-      email: '',
-      username: ''
-    },
-    bio: '',
-    profile_picture: null,
-    Affiliation: ''
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('/user/profile/');
-      setProfile(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load profile');
-      setLoading(false);
-    }
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      await api.put('/user/profile/', profile);
-      setIsEditing(false);
-      fetchProfile();
-    } catch (err) {
-      setError('Failed to update profile');
-    }
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('profile_picture', file);
-
-    try {
-      await api.post('/user/profile/upload-picture/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      fetchProfile();
-    } catch (err) {
-      setError('Failed to upload image');
-    }
-  };
+  const {
+    profile,
+    isEditing,
+    loading,
+    error,
+    handleUpdate,
+    handleImageUpload,
+    updateProfileField,
+    toggleEditing
+  } = useProfile();
 
   if (loading) return <div className="text-center mt-8">Loading...</div>;
 
@@ -86,7 +38,7 @@ function Profile() {
                   <img
                     src={profile.profile_picture}
                     alt="Profile"
-                    className="w-32 h-32 rounded-full mx-auto"
+                    className="w-32 h-32 rounded-full mx-auto object-cover"
                   />
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center">
@@ -103,9 +55,10 @@ function Profile() {
               />
               <label
                 htmlFor="profile-image"
-                className="cursor-pointer text-blue-600 hover:text-blue-500 text-sm"
+                className={`cursor-pointer text-blue-600 hover:text-blue-500 text-sm ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
               >
-                Change Profile Picture
+                {loading ? 'Uploading...' : 'Change Profile Picture'}
               </label>
             </div>
 
@@ -135,7 +88,7 @@ function Profile() {
                   <label className="block text-sm font-medium text-gray-700">Bio</label>
                   <textarea
                     value={profile.bio || ''}
-                    onChange={e => setProfile({ ...profile, bio: e.target.value })}
+                    onChange={e => updateProfileField('bio', e.target.value)}
                     disabled={!isEditing}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     rows="3"
@@ -147,7 +100,7 @@ function Profile() {
                   <input
                     type="text"
                     value={profile.Affiliation || ''}
-                    onChange={e => setProfile({ ...profile, Affiliation: e.target.value })}
+                    onChange={e => updateProfileField('Affiliation', e.target.value)}
                     disabled={!isEditing}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -158,7 +111,7 @@ function Profile() {
                 {!isEditing ? (
                   <button
                     type="button"
-                    onClick={() => setIsEditing(true)}
+                    onClick={toggleEditing}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     Edit Profile
@@ -167,7 +120,7 @@ function Profile() {
                   <>
                     <button
                       type="button"
-                      onClick={() => setIsEditing(false)}
+                      onClick={toggleEditing}
                       className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Cancel

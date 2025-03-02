@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useContext, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import  LogoutButton  from './LogoutButton';
-
+import { AuthContext } from '../../features/auth/AuthContext';
+import LogoutButton from '../../features/auth/LogoutButton';
 
 const Navbar = () => {
-  const { user } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -38,8 +37,8 @@ const Navbar = () => {
             <Link to="/courses" className="text-gray-600 hover:text-blue-600">Courses</Link>
             <Link to="/study-groups" className="text-gray-600 hover:text-blue-600">Study Groups</Link>
             <Link to="/resources" className="text-gray-600 hover:text-blue-600">Resources</Link>
-            <div className="ml-4 flex space-x-2"> {/* Added flex and space-x-2 */}
-              {!user ? (
+            <div className="ml-4 flex space-x-2">
+              {!isAuthenticated ? (
                 <>
                   <Link to="/login" className="px-4 py-2 text-center text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white">
                     Login
@@ -49,7 +48,10 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <LogoutButton />
+                <>
+                  <span className="text-gray-600 mr-4">Welcome, {user['user']['username']}!</span>
+                  <LogoutButton />
+                </>
               )}
             </div>
           </div>
@@ -65,7 +67,7 @@ const Navbar = () => {
               <Link to="/resources" className="text-gray-600 hover:text-blue-600">Resources</Link>
               {/* Mobile Navigation buttons */}
               <div className="space-y-2">
-              {!user ? (
+              {!isAuthenticated ? (
                 <>
                   <Link to="/login" className="block px-4 py-2 text-center text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white">
                     Login
@@ -75,7 +77,12 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <LogoutButton />
+                <>
+                  <div className="text-gray-600 mb-2">
+                    Welcome, {user.name}!
+                  </div>
+                  <LogoutButton />
+                </>
               )}
               </div>
             </div>

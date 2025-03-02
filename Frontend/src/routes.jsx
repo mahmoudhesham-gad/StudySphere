@@ -1,25 +1,26 @@
 // src/routes.jsx
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { useContext } from 'react';
-import { AuthContext } from './context/AuthContext';
+import { AuthContext } from './features/auth/AuthContext';
+import Loading  from './components/ui/Loading';
 
 // Import your page components
-import Login from './pages/Login';
-import Register from './pages/Register';
-import NotFound from './pages/NotFound';
-import Layout from './components/Layout';
-import Profile from './pages/Profile';
+import Login from './pages/users/Login';
+import Register from './pages/users/Register';
+import NotFound from './pages/users/NotFound';
+import Layout from './components/Layout/Layout'
+import Profile from './pages/users/Profile';
 import Home from './pages/Home';
 
 // Protected route wrapper
 const ProtectedRoute = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { isAuthenticated, loading } = useContext(AuthContext);
   
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading size="lg" fullScreen text="Loading your profile..." />;
   }
   
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
@@ -28,13 +29,13 @@ const ProtectedRoute = () => {
 
 // Public route wrapper (redirects if already authenticated)
 const PublicRoute = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { isAuthenticated, loading } = useContext(AuthContext);
   
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading size="lg" fullScreen text="Please wait..." />;
   }
   
-  if (user) {
+  if (isAuthenticated) {
     return <Navigate to="/profile" replace />;
   }
 
@@ -54,11 +55,11 @@ export const router = createBrowserRouter([
         element: <PublicRoute />,
         children: [
           {
-            path: 'login',
+            path: 'login/',
             element: <Login />
           },
           {
-            path: 'register',
+            path: 'register/',
             element: <Register />
           }
         ]

@@ -1,68 +1,10 @@
 // src/pages/Register.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { authService } from '../api/authService';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useRegisterForm } from '../../hooks/auth/useRegisterForm';
 
 function Register() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const userData = {
-        username: formData.name, // Changed from name to username
-        email: formData.email,
-        password: formData.password,
-        confirm_password: formData.confirmPassword
-      };
-      
-      const response = await authService.register(userData);
-      console.log('Registration response:', response);
-      navigate('/login', { 
-        state: { 
-          message: 'Registration successful! Please login.' 
-        } 
-      });
-    } catch (err) {
-      console.error('Registration error:', err);
-      if (err.response?.data?.email) {
-        setError(err.response.data.email[0]);
-      } else if (err.response?.data?.username) {
-        setError(err.response.data.username[0]);
-      } else if (err.response?.data?.password) {
-        setError(err.response.data.password[0]);
-      } else {
-        setError(err.response?.data?.message || 'Registration failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { formData, error, loading, handleChange, handleSubmit } = useRegisterForm();
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
