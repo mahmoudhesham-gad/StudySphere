@@ -9,67 +9,177 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('groups_courses', '0002_group_edit_permissions_joinrequest'),
+        ("groups_courses", "0002_group_edit_permissions_joinrequest"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Label',
+            name="Label",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=64)),
-                ('min_value', models.PositiveIntegerField(default=0)),
-                ('max_value', models.PositiveIntegerField(default=32)),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='groups_courses.group')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                ("min_value", models.PositiveIntegerField(default=0)),
+                ("max_value", models.PositiveIntegerField(default=32)),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="groups_courses.group",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('name', 'group')},
+                "unique_together": {("name", "group")},
             },
         ),
         migrations.CreateModel(
-            name='Material',
+            name="Material",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=255)),
-                ('file', models.FileField(null=True, upload_to='materials/', validators=[materials.validation.validate_file_mime, django.core.validators.FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt']), materials.validation.validate_file_size])),
-                ('url', models.URLField(null=True, validators=[materials.validation.VideoURLValidator()])),
-                ('type', models.CharField(choices=[('document', 'Document'), ('url', 'URL')], max_length=8)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='groups_courses.course')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                (
+                    "file",
+                    models.FileField(
+                        null=True,
+                        upload_to="materials/",
+                        validators=[
+                            django.core.validators.FileExtensionValidator(
+                                allowed_extensions=[
+                                    "pdf",
+                                    "doc",
+                                    "docx",
+                                    "ppt",
+                                    "pptx",
+                                    "xls",
+                                    "xlsx",
+                                    "txt",
+                                ]
+                            ),
+                            materials.validation.validate_file_size,
+                        ],
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        null=True, validators=[materials.validation.VideoURLValidator()]
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("document", "Document"), ("url", "URL")], max_length=8
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "course",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="groups_courses.course",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='MaterialComment',
+            name="MaterialComment",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('Content', models.TextField()),
-                ('CreatedAt', models.DateTimeField(auto_now_add=True)),
-                ('User', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('material', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='materials.material')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("Content", models.TextField()),
+                ("CreatedAt", models.DateTimeField(auto_now_add=True)),
+                (
+                    "User",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "material",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="materials.material",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='MaterialLabel',
+            name="MaterialLabel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.PositiveIntegerField()),
-                ('label', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='materials.label')),
-                ('material', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='labels', to='materials.material')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.PositiveIntegerField()),
+                (
+                    "label",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="materials.label",
+                    ),
+                ),
+                (
+                    "material",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="labels",
+                        to="materials.material",
+                    ),
+                ),
             ],
         ),
         migrations.AddConstraint(
-            model_name='material',
-            constraint=models.CheckConstraint(condition=models.Q(('file__isnull', False), ('url__isnull', False), _connector='OR'), name='file_or_url_required'),
+            model_name="material",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    ("file__isnull", False), ("url__isnull", False), _connector="OR"
+                ),
+                name="file_or_url_required",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='materiallabel',
-            unique_together={('material', 'label')},
+            name="materiallabel",
+            unique_together={("material", "label")},
         ),
     ]
