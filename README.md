@@ -9,7 +9,7 @@ Ensure you have the following installed:
 ### Clone the Repository
 ```bash
 git clone https://github.com/yourusername/StudySphere.git
-cd StudySphere/Backend
+cd StudySphere/
 ```
 
 ### Setup Environment Variables
